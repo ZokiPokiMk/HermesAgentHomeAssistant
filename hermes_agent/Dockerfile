@@ -10,7 +10,7 @@ ARG TARGETARCH
 ENV HERMES_HOME=/config/.hermes
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends nginx jq curl iproute2 && \
+    apt-get install -y --no-install-recommends nginx jq curl iproute2 tini && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /run/nginx
 
