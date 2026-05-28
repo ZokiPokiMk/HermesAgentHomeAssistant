@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/command/with-contenv bash
 set -euo pipefail
 
 OPTIONS_PATH="${OPTIONS_PATH:-/data/options.json}"
 ADDON_CONFIG_DIR="${ADDON_CONFIG_DIR:-/config}"
 export HERMES_HOME="${HERMES_HOME:-/config/.hermes}"
 PYTHON_BIN="${PYTHON_BIN:-/opt/hermes/.venv/bin/python}"
+HERMES_BIN="${HERMES_BIN:-/opt/hermes/bin/hermes}"
 
 mkdir -p "$HERMES_HOME" "$HERMES_HOME/workspace" "$ADDON_CONFIG_DIR"
 mkdir -p /run/nginx 2>/dev/null || true
@@ -418,7 +419,7 @@ trap shutdown TERM INT
 
 if [ "$ENABLE_DASHBOARD" = "true" ]; then
   echo "Starting Hermes dashboard on 127.0.0.1:${DASHBOARD_PORT} ..."
-  /opt/hermes/docker/entrypoint.sh dashboard --host 127.0.0.1 --port "$DASHBOARD_PORT" --no-open &
+  "$HERMES_BIN" dashboard --host 127.0.0.1 --port "$DASHBOARD_PORT" --no-open &
   DASHBOARD_PID=$!
 else
   echo "Hermes dashboard disabled."
@@ -452,20 +453,20 @@ nginx -g 'daemon off;' &
 NGINX_PID=$!
 
 echo "Starting Hermes Home Assistant gateway..."
-/opt/hermes/docker/entrypoint.sh gateway run --replace &
+"$HERMES_BIN" gateway run --replace &
 GW_PID=$!
 
 while [ "$SHUTTING_DOWN" = "false" ]; do
   if ! kill -0 "$GW_PID" >/dev/null 2>&1; then
     echo "WARN: Hermes gateway exited. Restarting in 3s..."
     sleep 3
-    /opt/hermes/docker/entrypoint.sh gateway &
+    "$HERMES_BIN" gateway run --replace &
     GW_PID=$!
   fi
   if [ -n "$DASHBOARD_PID" ] && ! kill -0 "$DASHBOARD_PID" >/dev/null 2>&1; then
     echo "WARN: Hermes dashboard exited. Restarting in 3s..."
     sleep 3
-    /opt/hermes/docker/entrypoint.sh dashboard --host 127.0.0.1 --port "$DASHBOARD_PORT" --no-open &
+    "$HERMES_BIN" dashboard --host 127.0.0.1 --port "$DASHBOARD_PORT" --no-open &
     DASHBOARD_PID=$!
   fi
   if [ -n "$TTYD_PID" ] && ! kill -0 "$TTYD_PID" >/dev/null 2>&1; then

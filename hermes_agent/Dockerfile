@@ -10,7 +10,7 @@ ARG TARGETARCH
 ENV HERMES_HOME=/config/.hermes
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends nginx jq curl iproute2 tini && \
+    apt-get install -y --no-install-recommends nginx jq curl iproute2 && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /run/nginx
 
@@ -29,4 +29,4 @@ LABEL \
   io.hass.type="app" \
   io.hass.arch="${BUILD_ARCH}"
 
-ENTRYPOINT ["/usr/bin/tini", "-g", "--", "/run.sh"]
+ENTRYPOINT ["/init", "/run.sh"]
