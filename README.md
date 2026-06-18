@@ -13,7 +13,7 @@ The same nginx-backed web UI is also exposed on host port `9119` for trusted net
 1. In Home Assistant, open **Settings > Add-ons > Add-on Store**.
 2. Open the three-dot menu, choose **Repositories**, and add:
 
-   `https://github.com/ImBada/HermesAgentHomeAssistant`
+   `https://github.com/ZokiPokiMk/HermesAgentHomeAssistant`
 
 3. Install **Hermes Agent**.
 4. Start the add-on, open the terminal or dashboard, then configure Hermes with `hermes setup` / `hermes model`.

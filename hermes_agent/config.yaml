@@ -2,7 +2,7 @@ name: Hermes Agent
 version: "0.1.0"
 slug: hermes_agent
 description: Self-improving AI agent with Home Assistant event monitoring and smart-home tools.
-url: https://github.com/ImBada/HermesAgentHomeAssistant
+url: https://github.com/ZokiPokiMk/HermesAgentHomeAssistant
 arch:
   - amd64
   - aarch64
