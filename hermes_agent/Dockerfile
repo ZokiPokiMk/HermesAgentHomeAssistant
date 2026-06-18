@@ -1,7 +1,7 @@
 ARG BUILD_VERSION=0.1.0
 ARG BUILD_ARCH=amd64
 
-FROM nousresearch/hermes-agent:latest
+FROM nousresearch/hermes-agent:main
 
 ARG BUILD_VERSION=0.1.0
 ARG BUILD_ARCH=amd64
