@@ -1,5 +1,5 @@
 name: Hermes Agent
-version: "0.1.1"
+version: "0.1.2"
 slug: hermes_agent
 description: Self-improving AI agent with Home Assistant event monitoring and smart-home tools.
 url: https://github.com/ZokiPokiMk/HermesAgentHomeAssistant
@@ -48,7 +48,10 @@ options:
     - climate
     - alarm_control_panel
     - light
-  watch_entities: []
+    - switch
+    - binary_sensor
+  watch_entities:
+    - sensor.tz3000_zl1kmjqx_ty0201_temperature
   ignore_entities:
     - sensor.uptime
     - sensor.cpu_usage
