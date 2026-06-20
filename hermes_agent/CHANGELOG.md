@@ -1,5 +1,5 @@
 # Changelog
-## 0.1.3
+## 0.1.4
 - Add options for tui & insecure
 - added Hermes WebUI https://github.com/nesquena/hermes-webui
 ## 0.1.2
