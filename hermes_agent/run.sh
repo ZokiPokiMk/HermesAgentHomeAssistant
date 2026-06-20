@@ -209,6 +209,10 @@ runtime = {
     "terminal_port": validated_port("terminal_port", 7681),
     "enable_dashboard": boolean("enable_dashboard", True),
     "nginx_log_level": text("nginx_log_level", "minimal"),
+    "tui": boolean("tui", False),
+    "insecure": boolean("insecure", True),
+    "enable_webui": boolean("enable_webui", True),
+    "webui_password": text("webui_password", ""),
 }
 (home / ".addon_runtime.json").write_text(json.dumps(runtime, indent=2) + "\n", encoding="utf-8")
 
@@ -360,11 +364,16 @@ ENABLE_DASHBOARD="$(read_runtime '.enable_dashboard')"
 DASHBOARD_PORT="9118"
 DASHBOARD_PROXY_PORT="49118"
 NGINX_LOG_LEVEL="$(read_runtime '.nginx_log_level')"
+TUI_FLAG="$(read_runtime '.tui')"
+INSECURE_FLAG="$(read_runtime '.insecure')"
+ENABLE_WEBUI="$(read_runtime '.enable_webui')"
+WEBUI_PASSWORD="$(read_runtime '.webui_password')"
 
 GW_PID=""
 DASHBOARD_PID=""
 TTYD_PID=""
 NGINX_PID=""
+WEBUI_PID=""
 SHUTTING_DOWN=false
 HERMES_TERMINAL_HOME="$HERMES_HOME/home"
 HERMES_TERMINAL_BASHRC="$HERMES_TERMINAL_HOME/.bashrc"
@@ -407,7 +416,7 @@ start_terminal() {
 shutdown() {
   SHUTTING_DOWN=true
   echo "Shutdown requested; stopping Hermes Agent services..."
-  for pid in "$NGINX_PID" "$TTYD_PID" "$DASHBOARD_PID" "$GW_PID"; do
+  for pid in "$NGINX_PID" "$TTYD_PID" "$DASHBOARD_PID" "$WEBUI_PID" "$GW_PID"; do
     if [ -n "$pid" ] && kill -0 "$pid" >/dev/null 2>&1; then
       kill -TERM "$pid" >/dev/null 2>&1 || true
     fi
@@ -417,9 +426,17 @@ shutdown() {
 
 trap shutdown TERM INT
 
+DASHBOARD_EXTRA_ARGS=""
+if [ "$TUI_FLAG" = "true" ]; then
+  DASHBOARD_EXTRA_ARGS="$DASHBOARD_EXTRA_ARGS --tui"
+fi
+if [ "$INSECURE_FLAG" = "true" ]; then
+  DASHBOARD_EXTRA_ARGS="$DASHBOARD_EXTRA_ARGS --insecure"
+fi
+
 if [ "$ENABLE_DASHBOARD" = "true" ]; then
   echo "Starting Hermes dashboard on 0.0.0.0:${DASHBOARD_PORT} ..."
-  "$HERMES_BIN" dashboard --host 0.0.0.0 --port "$DASHBOARD_PORT" --insecure --no-open --tui &
+  "$HERMES_BIN" dashboard --host 0.0.0.0 --port "$DASHBOARD_PORT" --no-open $DASHBOARD_EXTRA_ARGS &
   DASHBOARD_PID=$!
 else
   echo "Hermes dashboard disabled."
@@ -429,6 +446,25 @@ if [ "$ENABLE_TERMINAL" = "true" ]; then
   start_terminal
 else
   echo "Web terminal disabled."
+fi
+
+start_webui() {
+  if [ -d "/hermes-webui" ]; then
+    echo "Starting Hermes Web UI on port 8787 ..."
+    if [ -n "$WEBUI_PASSWORD" ]; then
+      export HERMES_WEBUI_PASSWORD="$WEBUI_PASSWORD"
+    fi
+    cd /hermes-webui && ./start.sh &
+    WEBUI_PID=$!
+  else
+    echo "Hermes Web UI directory not found; skipping."
+  fi
+}
+
+if [ "$ENABLE_WEBUI" = "true" ]; then
+  start_webui
+else
+  echo "Hermes Web UI disabled."
 fi
 
 DISK_TOTAL="$(df -h "$HERMES_HOME" | awk 'NR==2{print $2}')"
@@ -441,6 +477,8 @@ DASHBOARD_PORT="$DASHBOARD_PORT" \
 DASHBOARD_PROXY_PORT="$DASHBOARD_PROXY_PORT" \
 ENABLE_TERMINAL="$ENABLE_TERMINAL" \
 ENABLE_DASHBOARD="$ENABLE_DASHBOARD" \
+ENABLE_WEBUI="$ENABLE_WEBUI" \
+WEBUI_PORT="8787" \
 DISK_TOTAL="$DISK_TOTAL" \
 DISK_USED="$DISK_USED" \
 DISK_AVAIL="$DISK_AVAIL" \
@@ -466,13 +504,18 @@ while [ "$SHUTTING_DOWN" = "false" ]; do
   if [ -n "$DASHBOARD_PID" ] && ! kill -0 "$DASHBOARD_PID" >/dev/null 2>&1; then
     echo "WARN: Hermes dashboard exited. Restarting in 3s..."
     sleep 3
-    "$HERMES_BIN" dashboard --host 0.0.0.0 --port "$DASHBOARD_PORT" --insecure --no-open --tui &
+    "$HERMES_BIN" dashboard --host 0.0.0.0 --port "$DASHBOARD_PORT" --no-open $DASHBOARD_EXTRA_ARGS &
     DASHBOARD_PID=$!
   fi
   if [ -n "$TTYD_PID" ] && ! kill -0 "$TTYD_PID" >/dev/null 2>&1; then
     echo "WARN: web terminal exited. Restarting in 3s..."
     sleep 3
     start_terminal
+  fi
+  if [ -n "$WEBUI_PID" ] && ! kill -0 "$WEBUI_PID" >/dev/null 2>&1; then
+    echo "WARN: Hermes Web UI exited. Restarting in 3s..."
+    sleep 3
+    start_webui
   fi
   if ! kill -0 "$NGINX_PID" >/dev/null 2>&1; then
     echo "ERROR: nginx exited; stopping add-on."

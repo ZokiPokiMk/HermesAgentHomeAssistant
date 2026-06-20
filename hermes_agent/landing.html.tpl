@@ -38,6 +38,7 @@
       </div>
       <div class="actions">
         <a class="btn" id="dashboard-link" href="http://localhost:__DASHBOARD_PORT__/" target="_blank" rel="noreferrer">Dashboard</a>
+        <a class="btn secondary" id="webui-link" href="./webui/" target="_blank" rel="noreferrer">Web UI</a>
         <a class="btn secondary" href="./terminal/" target="_self">Terminal</a>
       </div>
     </header>

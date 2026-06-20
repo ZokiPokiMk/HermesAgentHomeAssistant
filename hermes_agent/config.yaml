@@ -20,9 +20,11 @@ panel_icon: mdi:robot
 ports:
   48099/tcp: 9119
   49118/tcp: 9118
+  8787/tcp: 8787
 ports_description:
   48099/tcp: External Hermes Agent web UI and terminal proxy.
   49118/tcp: External Hermes dashboard.
+  8787/tcp: Hermes Web UI.
 
 backup: hot
 backup_exclude:
@@ -62,6 +64,10 @@ options:
   force_ipv4_dns: true
   http_proxy: ""
   nginx_log_level: minimal
+  tui: false
+  insecure: true
+  enable_webui: true
+  webui_password: ""
 schema:
   timezone: str
   enable_terminal: bool
@@ -83,3 +89,7 @@ schema:
   http_proxy: "str?"
   nginx_log_level: "list(full|minimal)"
   hass_token: "password?"
+  tui: bool
+  insecure: bool
+  enable_webui: bool
+  webui_password: "password?"

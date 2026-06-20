@@ -15,6 +15,8 @@ def main():
     dashboard_proxy_port = os.environ.get("DASHBOARD_PROXY_PORT", "49118")
     enable_terminal = os.environ.get("ENABLE_TERMINAL", "true")
     enable_dashboard = os.environ.get("ENABLE_DASHBOARD", "true")
+    enable_webui = os.environ.get("ENABLE_WEBUI", "true")
+    webui_port = os.environ.get("WEBUI_PORT", "8787")
     nginx_log_level = os.environ.get("NGINX_LOG_LEVEL", "minimal")
 
     disk_total = os.environ.get("DISK_TOTAL", "")
@@ -40,6 +42,8 @@ def main():
     conf = conf.replace("__DASHBOARD_PROXY_PORT__", dashboard_proxy_port)
     conf = conf.replace("__TERMINAL_BLOCK__", "" if enable_terminal == "true" else "return 404;")
     conf = conf.replace("__DASHBOARD_BLOCK__", "" if enable_dashboard == "true" else "return 404;")
+    conf = conf.replace("__WEBUI_BLOCK__", "" if enable_webui == "true" else "return 404;")
+    conf = conf.replace("__WEBUI_PORT__", webui_port)
     nginx_out_path.parent.mkdir(parents=True, exist_ok=True)
     nginx_out_path.write_text(conf, encoding="utf-8")
 
@@ -52,6 +56,9 @@ def main():
         "__TERMINAL_STATUS__": terminal_status,
         "__DASHBOARD_STATUS__": dashboard_status,
         "__DASHBOARD_PORT__": dashboard_port,
+        "__WEBUI_PORT__": webui_port,
+        "__ENABLE_WEBUI__": enable_webui,
+        "__WEBUI_STATUS__": "Enabled" if enable_webui == "true" else "Disabled",
         "__DISK_TOTAL__": disk_total,
         "__DISK_USED__": disk_used,
         "__DISK_AVAIL__": disk_avail,
