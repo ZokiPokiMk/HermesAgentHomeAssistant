@@ -50,3 +50,15 @@ configuration:
   hass_token:
     name: Home Assistant token
     description: Optional Long-Lived Access Token when not using the Supervisor API.
+  tui:
+    name: TUI mode
+    description: Enable terminal user interface mode for the Hermes dashboard.
+  insecure:
+    name: Insecure mode
+    description: Allow the Hermes dashboard to start without TLS encryption.
+  enable_webui:
+    name: Enable Web UI
+    description: Start the Hermes Web UI and expose it through Ingress.
+  webui_password:
+    name: Web UI password
+    description: Optional password for the Hermes Web UI. Leave empty to disable authentication.
