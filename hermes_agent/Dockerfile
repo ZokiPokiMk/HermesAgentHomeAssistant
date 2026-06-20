@@ -15,8 +15,7 @@ RUN apt-get update && \
     mkdir -p /run/nginx
 
 RUN git clone https://github.com/nesquena/hermes-webui.git /hermes-webui && \
-    cd /hermes-webui && \
-    python3 bootstrap.py || true
+    /opt/hermes/.venv/bin/pip install --no-cache-dir -r /hermes-webui/requirements.txt
 
 RUN ARCH="$(echo ${TARGETARCH:-$(dpkg --print-architecture)} | sed 's|arm64|aarch64|;s|arm/v7|armhf|;s|armv7|armhf|;s|amd64|x86_64|')" && \
     curl -fsSL "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.${ARCH}" -o /usr/local/bin/ttyd && \
