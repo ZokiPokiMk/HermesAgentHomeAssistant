@@ -79,6 +79,10 @@
     if (dashboardLink) {
       dashboardLink.href = `http://${window.location.hostname}:__DASHBOARD_PORT__/`;
     }
+    const webuiLink = document.getElementById('webui-link');
+    if (webuiLink) {
+      webuiLink.href = `http://${window.location.hostname}:__WEBUI_PORT__/`;
+    }
   </script>
 </body>
 </html>
