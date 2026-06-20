@@ -1,5 +1,7 @@
 # Changelog
-
+## 0.1.3
+- Add options for tui & insecure
+- added Hermes WebUI https://github.com/nesquena/hermes-webui
 ## 0.1.2
 
 - Exposes the Hermes dashboard on host port `9118`, separate from the nginx-backed web UI on host port `9119`.
