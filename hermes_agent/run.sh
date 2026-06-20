@@ -461,8 +461,14 @@ start_webui() {
     if [ -n "$WEBUI_PASSWORD" ]; then
       WEBUI_ENV+=("HERMES_WEBUI_PASSWORD=$WEBUI_PASSWORD")
     fi
-    env "${WEBUI_ENV[@]}" "$PYTHON_BIN" /hermes-webui/server.py &
-    WEBUI_PID=$!
+    env "${WEBUI_ENV[@]}" /hermes-webui/ctl.sh restart >/dev/null 2>&1 || true
+    # Read the PID that ctl.sh wrote for watchdog monitoring
+    sleep 2
+    if [ -f "$HERMES_HOME/webui.pid" ]; then
+      WEBUI_PID="$(cat "$HERMES_HOME/webui.pid")"
+    else
+      WEBUI_PID=""
+    fi
   else
     echo "Hermes Web UI directory not found; skipping."
   fi
