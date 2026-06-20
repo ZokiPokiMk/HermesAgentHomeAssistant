@@ -454,7 +454,7 @@ start_webui() {
     # Remove stale PID file left by bootstrap.py during Docker build
     rm -f "$HERMES_HOME/webui.pid" 2>/dev/null || true
     WEBUI_ENV=(
-      "HERMES_WEBUI_HOST=127.0.0.1"
+      "HERMES_WEBUI_HOST=0.0.0.0"
       "HERMES_WEBUI_PORT=8787"
       "HERMES_HOME=$HERMES_HOME"
     )
